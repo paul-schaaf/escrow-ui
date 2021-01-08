@@ -1,5 +1,5 @@
 import { AccountLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { Account, clusterApiUrl, Connection, PublicKey, SystemProgram, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
 const bs58 = require('bs58');
 import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout";
@@ -51,7 +51,8 @@ export const initEscrow = async (
             { pubkey: tempTokenAccount.publicKey, isSigner: false, isWritable: true },
             { pubkey: new PublicKey(initializerReceivingTokenAccountPubkeyString), isSigner: false, isWritable: false },
             { pubkey: escrowAccount.publicKey, isSigner: false, isWritable: true },
-            { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false }
+            { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},
+            { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
         ],
         data: Buffer.from(Uint8Array.of(0, ...new BN(expectedAmount).toArray("le", 8)))
     })
