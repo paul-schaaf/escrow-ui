@@ -20,7 +20,12 @@ export const takeTrade = async (
     const bobYTokenAccountPubkey = new PublicKey(bobYTokenAccountAddressString);
     const programId = new PublicKey(programIdString);
 
-    const encodedEscrowState = (await connection.getAccountInfo(escrowAccountPubkey, 'singleGossip'))!.data;
+    let encodedEscrowState;
+    try {
+        encodedEscrowState = (await connection.getAccountInfo(escrowAccountPubkey, 'singleGossip'))!.data;
+    } catch (err) {
+        throw new Error("Could not find escrow at given address!")
+    }
     const decodedEscrowLayout = ESCROW_ACCOUNT_DATA_LAYOUT.decode(encodedEscrowState) as EscrowLayout;
     const escrowState =  {
         escrowAccountPubkey: escrowAccountPubkey,
