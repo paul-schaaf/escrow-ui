@@ -68,6 +68,7 @@ export default defineComponent({
               formState.XTokenExpectedAmount,
               formState.programId
               );
+              alert("Success! Alice and Bob have traded their tokens and all temporary accounts have been closed");
           } catch (err) {
             alert(err.message);
           }
