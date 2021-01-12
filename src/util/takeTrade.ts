@@ -38,8 +38,8 @@ export const takeTrade = async (
         data: Buffer.from(Uint8Array.of(1, ...new BN(bobExpectedXTokenAmount).toArray("le", 8))),
         keys: [
             { pubkey: bobAccount.publicKey, isSigner: true, isWritable: false },
-            { pubkey: bobXTokenAccountPubkey, isSigner: false, isWritable: true },
             { pubkey: bobYTokenAccountPubkey, isSigner: false, isWritable: true },
+            { pubkey: bobXTokenAccountPubkey, isSigner: false, isWritable: true },
             { pubkey: escrowState.XTokenTempAccountPubkey, isSigner: false, isWritable: true},
             { pubkey: escrowState.initializerAccountPubkey, isSigner: false, isWritable: true},
             { pubkey: escrowState.initializerYTokenAccount, isSigner: false, isWritable: true},
