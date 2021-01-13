@@ -54,5 +54,5 @@ export const takeTrade = async (
         ] 
     })
 
-    await connection.sendTransaction(new Transaction().add(exchangeInstruction), [bobAccount]);
+    await connection.sendTransaction(new Transaction().add(exchangeInstruction), [bobAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
 }

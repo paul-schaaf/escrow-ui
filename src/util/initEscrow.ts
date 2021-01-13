@@ -59,7 +59,7 @@ export const initEscrow = async (
 
     const tx = new Transaction()
         .add(createTempTokenAccountIx, initTempAccountIx, transferXTokensToTempAccIx, createEscrowAccountIx, initEscrowIx);
-    await connection.sendTransaction(tx, [aliceAccount, tempTokenAccount, escrowAccount]);
+    await connection.sendTransaction(tx, [aliceAccount, tempTokenAccount, escrowAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
