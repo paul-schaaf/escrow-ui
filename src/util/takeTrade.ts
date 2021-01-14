@@ -9,15 +9,15 @@ const connection = new Connection("http://localhost:8899", 'singleGossip');
 export const takeTrade = async (
     privateKey: string,
     escrowAccountAddressString: string,
-    bobXTokenAccountAddressString: string,
-    bobYTokenAccountAddressString: string,
-    bobExpectedXTokenAmount: number,
+    takerXTokenAccountAddressString: string,
+    takerYTokenAccountAddressString: string,
+    takerExpectedXTokenAmount: number,
     programIdString: string,
 ) => {
-    const bobAccount = new Account(bs58.decode(privateKey));
+    const takerAccount = new Account(bs58.decode(privateKey));
     const escrowAccountPubkey = new PublicKey(escrowAccountAddressString);
-    const bobXTokenAccountPubkey = new PublicKey(bobXTokenAccountAddressString);
-    const bobYTokenAccountPubkey = new PublicKey(bobYTokenAccountAddressString);
+    const takerXTokenAccountPubkey = new PublicKey(takerXTokenAccountAddressString);
+    const takerYTokenAccountPubkey = new PublicKey(takerYTokenAccountAddressString);
     const programId = new PublicKey(programIdString);
 
     let encodedEscrowState;
@@ -40,11 +40,11 @@ export const takeTrade = async (
 
     const exchangeInstruction = new TransactionInstruction({
         programId,
-        data: Buffer.from(Uint8Array.of(1, ...new BN(bobExpectedXTokenAmount).toArray("le", 8))),
+        data: Buffer.from(Uint8Array.of(1, ...new BN(takerExpectedXTokenAmount).toArray("le", 8))),
         keys: [
-            { pubkey: bobAccount.publicKey, isSigner: true, isWritable: false },
-            { pubkey: bobYTokenAccountPubkey, isSigner: false, isWritable: true },
-            { pubkey: bobXTokenAccountPubkey, isSigner: false, isWritable: true },
+            { pubkey: takerAccount.publicKey, isSigner: true, isWritable: false },
+            { pubkey: takerYTokenAccountPubkey, isSigner: false, isWritable: true },
+            { pubkey: takerXTokenAccountPubkey, isSigner: false, isWritable: true },
             { pubkey: escrowState.XTokenTempAccountPubkey, isSigner: false, isWritable: true},
             { pubkey: escrowState.initializerAccountPubkey, isSigner: false, isWritable: true},
             { pubkey: escrowState.initializerYTokenAccount, isSigner: false, isWritable: true},
@@ -52,7 +52,7 @@ export const takeTrade = async (
             { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
             { pubkey: PDA[0], isSigner: false, isWritable: false}
         ] 
-    })
+    })    
 
-    await connection.sendTransaction(new Transaction().add(exchangeInstruction), [bobAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
+    await connection.sendTransaction(new Transaction().add(exchangeInstruction), [takerAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
 }

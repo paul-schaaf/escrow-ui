@@ -19,19 +19,19 @@ export const initEscrow = async (
     const XTokenMintAccountPubkey = new PublicKey((await connection.getParsedAccountInfo(initializerXTokenAccountPubkey, 'singleGossip')).value!.data.parsed.info.mint);
 
     const privateKeyDecoded = bs58.decode(privateKey);
-    const aliceAccount = new Account(privateKeyDecoded);
+    const initializerAccount = new Account(privateKeyDecoded);
 
     const tempTokenAccount = new Account();
     const createTempTokenAccountIx = SystemProgram.createAccount({
         programId: TOKEN_PROGRAM_ID,
         space: AccountLayout.span,
         lamports: await connection.getMinimumBalanceForRentExemption(AccountLayout.span, 'singleGossip'),
-        fromPubkey: aliceAccount.publicKey,
+        fromPubkey: initializerAccount.publicKey,
         newAccountPubkey: tempTokenAccount.publicKey
     });
-    const initTempAccountIx = Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, XTokenMintAccountPubkey, tempTokenAccount.publicKey, aliceAccount.publicKey);
+    const initTempAccountIx = Token.createInitAccountInstruction(TOKEN_PROGRAM_ID, XTokenMintAccountPubkey, tempTokenAccount.publicKey, initializerAccount.publicKey);
     const transferXTokensToTempAccIx = Token
-        .createTransferInstruction(TOKEN_PROGRAM_ID, initializerXTokenAccountPubkey, tempTokenAccount.publicKey, aliceAccount.publicKey, [], amountXTokensToSendToEscrow);
+        .createTransferInstruction(TOKEN_PROGRAM_ID, initializerXTokenAccountPubkey, tempTokenAccount.publicKey, initializerAccount.publicKey, [], amountXTokensToSendToEscrow);
     
     const escrowAccount = new Account();
     const escrowProgramId = new PublicKey(escrowProgramIdString);
@@ -39,7 +39,7 @@ export const initEscrow = async (
     const createEscrowAccountIx = SystemProgram.createAccount({
         space: ESCROW_ACCOUNT_DATA_LAYOUT.span,
         lamports: await connection.getMinimumBalanceForRentExemption(ESCROW_ACCOUNT_DATA_LAYOUT.span, 'singleGossip'),
-        fromPubkey: aliceAccount.publicKey,
+        fromPubkey: initializerAccount.publicKey,
         newAccountPubkey: escrowAccount.publicKey,
         programId: escrowProgramId
     });
@@ -47,7 +47,7 @@ export const initEscrow = async (
     const initEscrowIx = new TransactionInstruction({
         programId: escrowProgramId,
         keys: [
-            { pubkey: aliceAccount.publicKey, isSigner: true, isWritable: false },
+            { pubkey: initializerAccount.publicKey, isSigner: true, isWritable: false },
             { pubkey: tempTokenAccount.publicKey, isSigner: false, isWritable: true },
             { pubkey: new PublicKey(initializerReceivingTokenAccountPubkeyString), isSigner: false, isWritable: false },
             { pubkey: escrowAccount.publicKey, isSigner: false, isWritable: true },
@@ -59,7 +59,7 @@ export const initEscrow = async (
 
     const tx = new Transaction()
         .add(createTempTokenAccountIx, initTempAccountIx, transferXTokensToTempAccIx, createEscrowAccountIx, initEscrowIx);
-    await connection.sendTransaction(tx, [aliceAccount, tempTokenAccount, escrowAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
+    await connection.sendTransaction(tx, [initializerAccount, tempTokenAccount, escrowAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
