@@ -1,13 +1,12 @@
 import { AccountLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
-const bs58 = require('bs58');
 import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout";
 
 const connection = new Connection("http://localhost:8899", 'singleGossip');
 
 export const initEscrow = async (
-    privateKey: string,
+    privateKeyByteArray: string,
     initializerXTokenAccountPubkeyString: string,
     amountXTokensToSendToEscrow: number,
     initializerReceivingTokenAccountPubkeyString: string,
@@ -18,7 +17,7 @@ export const initEscrow = async (
     //@ts-expect-error
     const XTokenMintAccountPubkey = new PublicKey((await connection.getParsedAccountInfo(initializerXTokenAccountPubkey, 'singleGossip')).value!.data.parsed.info.mint);
 
-    const privateKeyDecoded = bs58.decode(privateKey);
+    const privateKeyDecoded = privateKeyByteArray.split(',').map(s => parseInt(s));
     const initializerAccount = new Account(privateKeyDecoded);
 
     const tempTokenAccount = new Account();

@@ -3,7 +3,7 @@
     <p class="title">Escrow UI</p>
     <div>
       <div class="mb-1">
-          <label for="2020-12-24-programId-escrow-alice">Throwaway private key</label>
+          <label for="2020-12-24-programId-escrow-alice">Throwaway private key (as byte array from sollet.io, without the '[]')</label>
           <input class="display-block" type="text" v-model="formState.privateKey">
         </div>
         <div class="mb-1">
