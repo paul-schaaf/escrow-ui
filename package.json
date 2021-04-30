@@ -28,8 +28,11 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "babel-eslint": "^10.1.0",
+    "bip39": "^3.0.3",
+    "ed25519-hd-key": "^1.2.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0-0",
+    "tweetnacl": "^1.0.3",
     "typescript": "~3.9.3"
   },
   "eslintConfig": {

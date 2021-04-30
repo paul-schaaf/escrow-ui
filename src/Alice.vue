@@ -3,8 +3,8 @@
     <p class="title">Escrow UI</p>
     <div>
       <div class="mb-1">
-          <label for="2020-12-24-programId-escrow-alice">Throwaway private key (as byte array from sollet.io, without the '[]')</label>
-          <input class="display-block" type="text" v-model="formState.privateKey">
+          <label for="2020-12-24-programId-escrow-alice">Throwaway sollet.io mnemonic</label>
+          <input class="display-block" type="text" v-model="formState.mnemonic">
       </div>
       <div class="mb-1">
           <label for="2020-12-24-programId-escrow-alice">Program id</label>
@@ -79,7 +79,7 @@ interface EscrowState {
 export default defineComponent({
   setup() {
     const formState = reactive({
-      privateKey: "",
+      mnemonic: "",
       programId: "",
       aliceXTokenAccountPubkey: "",
       aliceYTokenAccountPubkey: "",
@@ -97,7 +97,7 @@ export default defineComponent({
     });
 
     const resetAliceUI = () => {
-      formState.privateKey = "";
+      formState.mnemonic = "";
       formState.programId = "";
       formState.aliceXTokenAccountPubkey = "";
       formState.aliceYTokenAccountPubkey = "";
@@ -116,7 +116,7 @@ export default defineComponent({
           initializerYTokenAccount,
           expectedAmount
         } = await initEscrow(
-          formState.privateKey,
+          formState.mnemonic,
           formState.aliceXTokenAccountPubkey,
           formState.amountXTokensToSendToEscrow,
           formState.aliceYTokenAccountPubkey,

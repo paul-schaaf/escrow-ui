@@ -3,8 +3,8 @@
     <p class="title">Escrow UI</p>
     <div>
       <div class="mb-1">
-          <label for="2020-12-24-programId-escrow-alice">Throwaway private key (as byte array from sollet.io, without the '[]')</label>
-          <input class="display-block" type="text" v-model="formState.privateKey">
+          <label for="2020-12-24-programId-escrow-alice">Throwaway mnemonic from sollet.io</label>
+          <input class="display-block" type="text" v-model="formState.mnemonic">
         </div>
         <div class="mb-1">
           <label for="2020-12-24-programId-escrow-alice">Program id</label>
@@ -41,7 +41,7 @@ import { takeTrade } from "./util/takeTrade";
 export default defineComponent({
     setup() {
         const formState = reactive({
-            privateKey: "",
+            mnemonic: "",
             programId: "",
             takerXAccAddress: "",
             takerYAccAddress: "",
@@ -50,7 +50,7 @@ export default defineComponent({
         })
 
         const resetUI = () => {
-          formState.privateKey = "";
+          formState.mnemonic = "";
           formState.programId = "";
           formState.takerXAccAddress = "",
           formState.takerYAccAddress = "",
@@ -61,7 +61,7 @@ export default defineComponent({
         const onTakeTrade = async () => {
           try {
             await takeTrade(
-              formState.privateKey,
+              formState.mnemonic,
               formState.escrowAccAddress,
               formState.takerXAccAddress,
               formState.takerYAccAddress,

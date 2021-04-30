@@ -2,11 +2,13 @@ import { AccountLayout, Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
 import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout";
+import { derivePath } from 'ed25519-hd-key';
+import nacl from 'tweetnacl';
 
 const connection = new Connection("http://localhost:8899", 'singleGossip');
 
 export const initEscrow = async (
-    privateKeyByteArray: string,
+    mnemonic: string,
     initializerXTokenAccountPubkeyString: string,
     amountXTokensToSendToEscrow: number,
     initializerReceivingTokenAccountPubkeyString: string,
@@ -16,8 +18,11 @@ export const initEscrow = async (
 
     //@ts-expect-error
     const XTokenMintAccountPubkey = new PublicKey((await connection.getParsedAccountInfo(initializerXTokenAccountPubkey, 'singleGossip')).value!.data.parsed.info.mint);
-
-    const privateKeyDecoded = privateKeyByteArray.split(',').map(s => parseInt(s));
+    
+    const bip39 = await import('bip39');
+    const seed = await bip39.mnemonicToSeed(mnemonic);
+    const derivedSeed = derivePath(`m/44'/501'/0'/0'`, Buffer.from(seed).toString('hex')).key;
+    const privateKeyDecoded = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
     const initializerAccount = new Account(privateKeyDecoded);
 
     const tempTokenAccount = new Account();

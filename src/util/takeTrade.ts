@@ -2,18 +2,25 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Account, Connection, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
 import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout"; 
+import { derivePath } from 'ed25519-hd-key';
+import nacl from 'tweetnacl';
 
 const connection = new Connection("http://localhost:8899", 'singleGossip');
 
 export const takeTrade = async (
-    privateKeyByteArray: string,
+    mnemonic: string,
     escrowAccountAddressString: string,
     takerXTokenAccountAddressString: string,
     takerYTokenAccountAddressString: string,
     takerExpectedXTokenAmount: number,
     programIdString: string,
 ) => {
-    const takerAccount = new Account(privateKeyByteArray.split(',').map(s => parseInt(s)));
+    const bip39 = await import('bip39');
+    const seed = await bip39.mnemonicToSeed(mnemonic);
+    const derivedSeed = derivePath(`m/44'/501'/1'/0'`, Buffer.from(seed).toString('hex')).key;
+    const privateKeyDecoded = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+
+    const takerAccount = new Account(privateKeyDecoded);
     const escrowAccountPubkey = new PublicKey(escrowAccountAddressString);
     const takerXTokenAccountPubkey = new PublicKey(takerXTokenAccountAddressString);
     const takerYTokenAccountPubkey = new PublicKey(takerYTokenAccountAddressString);
