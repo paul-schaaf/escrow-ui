@@ -1,10 +1,11 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 
 const Alice = () => import("./Alice.vue")
 const Bob = () => import("./Bob.vue")
+const Cancel = () => import("./Cancel.vue")
 
 export default createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes: [
         {
             name: "Alice",
@@ -15,6 +16,11 @@ export default createRouter({
             name: "Bob",
             path: "/bob",
             component: Bob
+        },
+        {
+            name: "Cancel",
+            path: "/cancel",
+            component: Cancel
         }
     ]
 })

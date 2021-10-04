@@ -3,7 +3,7 @@ import { Account, Connection, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Tran
 import BN from "bn.js";
 import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout";
 
-const connection = new Connection("http://localhost:8899", 'singleGossip');
+const connection = new Connection("https://api.devnet.solana.com", 'singleGossip');
 
 export const initEscrow = async (
     privateKeyByteArray: string,
@@ -46,12 +46,13 @@ export const initEscrow = async (
     const initEscrowIx = new TransactionInstruction({
         programId: escrowProgramId,
         keys: [
-            { pubkey: initializerAccount.publicKey, isSigner: true, isWritable: false },
+            { pubkey: initializerAccount.publicKey, isSigner: true, isWritable: true },
             { pubkey: tempTokenAccount.publicKey, isSigner: false, isWritable: true },
             { pubkey: new PublicKey(initializerReceivingTokenAccountPubkeyString), isSigner: false, isWritable: false },
             { pubkey: escrowAccount.publicKey, isSigner: false, isWritable: true },
             { pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},
             { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+            { pubkey: new PublicKey('11111111111111111111111111111111'), isSigner: false, isWritable: false },
         ],
         data: Buffer.from(Uint8Array.of(0, ...new BN(expectedAmount).toArray("le", 8)))
     })

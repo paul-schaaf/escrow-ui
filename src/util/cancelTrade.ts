@@ -5,18 +5,15 @@ import { ESCROW_ACCOUNT_DATA_LAYOUT, EscrowLayout } from "./layout";
 
 const connection = new Connection("https://api.devnet.solana.com", 'singleGossip');
 
-export const takeTrade = async (
+export const cancelTrade = async (
     privateKeyByteArray: string,
     escrowAccountAddressString: string,
     takerXTokenAccountAddressString: string,
-    takerYTokenAccountAddressString: string,
-    takerExpectedXTokenAmount: number,
     programIdString: string,
 ) => {
-    const takerAccount = new Account(privateKeyByteArray.split(',').map(s => parseInt(s)));
+    const initializerAccount = new Account(privateKeyByteArray.split(',').map(s => parseInt(s)));
     const escrowAccountPubkey = new PublicKey(escrowAccountAddressString);
-    const takerXTokenAccountPubkey = new PublicKey(takerXTokenAccountAddressString);
-    const takerYTokenAccountPubkey = new PublicKey(takerYTokenAccountAddressString);
+    const initializerXTokenAccountPubkey = new PublicKey(takerXTokenAccountAddressString);
     const programId = new PublicKey(programIdString);
 
     let encodedEscrowState;
@@ -37,23 +34,17 @@ export const takeTrade = async (
 
     const PDA = await PublicKey.findProgramAddress([Buffer.from("escrow")], programId);
 
-    const exchangeInstruction = new TransactionInstruction({
+    const cancelInstruction = new TransactionInstruction({
         programId,
-        data: Buffer.from(Uint8Array.of(1, ...new BN(takerExpectedXTokenAmount).toArray("le", 8))),
         keys: [
-            { pubkey: takerAccount.publicKey, isSigner: true, isWritable: false },
-            { pubkey: takerYTokenAccountPubkey, isSigner: false, isWritable: true },
-            { pubkey: takerXTokenAccountPubkey, isSigner: false, isWritable: true },
+            { pubkey: initializerAccount.publicKey, isSigner: true, isWritable: true},
+            { pubkey: escrowAccountPubkey, isSigner: false, isWritable: true},
+            { pubkey: initializerXTokenAccountPubkey, isSigner: false, isWritable: true},
             { pubkey: escrowState.XTokenTempAccountPubkey, isSigner: false, isWritable: true},
-            { pubkey: escrowState.initializerAccountPubkey, isSigner: false, isWritable: true},
-            { pubkey: escrowState.initializerYTokenAccount, isSigner: false, isWritable: true},
-            { pubkey: escrowAccountPubkey, isSigner: false, isWritable: true },
-            { pubkey: new PublicKey('ATFG4vVMuemhjf254UyoK4jFqLNi9Eef4LvmJBR63qnc'), isSigner: false, isWritable: true},
             { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
-            { pubkey: new PublicKey('11111111111111111111111111111111'), isSigner: false, isWritable: false},
             { pubkey: PDA[0], isSigner: false, isWritable: false}
         ] 
     })    
 
-    await connection.sendTransaction(new Transaction().add(exchangeInstruction), [takerAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
+    await connection.sendTransaction(new Transaction().add(cancelInstruction), [initializerAccount], {skipPreflight: false, preflightCommitment: 'singleGossip'});
 }
