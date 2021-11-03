@@ -130,7 +130,11 @@ export default defineComponent({
         escrowState.initializerYTokenAccount = initializerYTokenAccount;
         escrowState.expectedAmount = expectedAmount;
       } catch(err) {
-        alert(err.message);
+        if (err instanceof Error) {
+          alert(err.message);
+        } else {
+          alert("A message-less error occurred");
+        }
       }
     }
 

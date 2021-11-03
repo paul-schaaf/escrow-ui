@@ -70,7 +70,11 @@ export default defineComponent({
               );
               alert("Success! Alice and Bob have traded their tokens and all temporary accounts have been closed");
           } catch (err) {
-            alert(err.message);
+            if (err instanceof Error) {
+              alert(err.message);
+            } else {
+              alert("A message-less error occurred");
+            }
           }
         }
 
